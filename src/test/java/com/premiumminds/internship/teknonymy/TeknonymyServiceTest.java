@@ -77,7 +77,7 @@ public class TeknonymyServiceTest {
   @Test
   public void TwoGenaritionsEach2ChildsTest(){
     Person F = new Person("F", 'M', null, LocalDateTime.of(2024,1,1,0,0));
-    Person G = new Person("G", 'M', null, LocalDateTime.of(2021,1,1,0,0));
+    Person G = new Person("G", 'M', null, LocalDateTime.of(2023,1,1,0,0));
     Person H = new Person("H", 'M', null, LocalDateTime.of(2022,1,1,0,0));
 
     Person E = new Person("E",'M', new Person[]{F,G}, LocalDateTime.of(2019,1,1,0,0));
@@ -85,7 +85,7 @@ public class TeknonymyServiceTest {
     Person D = new Person("D",'F',new Person[]{S,E}, LocalDateTime.of(2003,1,1,0,0));
 
     String result = new TeknonymyService().getTeknonymy(D);
-    String expected = "mother of G";
+    String expected = "mother of H";
     assertEquals(result, expected);
   }
 
