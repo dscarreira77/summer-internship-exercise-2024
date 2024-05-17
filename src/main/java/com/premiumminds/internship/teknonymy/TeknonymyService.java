@@ -2,8 +2,9 @@ package com.premiumminds.internship.teknonymy;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-
-import com.premiumminds.internship.teknonymy.Person;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 
 class TeknonymyService implements ITeknonymyService {
 
@@ -14,58 +15,37 @@ class TeknonymyService implements ITeknonymyService {
    * @return String which is the Teknonymy Name 
    */
   public String getTeknonymy(Person person) {
-    
-    String sex;
-
-    if(person.children() == null){ 
-      return "";
-    }else{
-
-      Person child = getLastGenerationChild(person);
-
-      if(person.sex() == 'M'){
-        sex = "father of ";
-      }else{
-        sex = "mother of ";
-      }
-      return sex + child.name();
+    if (getMaxGenerations(person) == 1) { 
+        return ""; // Se a pessoa não tiver filhos, não há tecnónimo
+    } else {
+        Person oldestLastGenerationChild = findOldestLastGenerationChild(person);
+        return generateTeknonymy(person, oldestLastGenerationChild);
     }
   }
 
-  public Person getLastGenerationChild(Person person){
-    if (person.children() == null){
-      return person;
-    }else{
-      for (Person child : person.children()){
-        if (child.children() == null){
-          if (getOldestChild(person.children()) == child){
-            return child;
-        }
-        }else{
-          return getLastGenerationChild(child);
-          }
-        }
-      }
-    return person;
-  }
-  
-  public Person getOldestChild(Person[] personList){
-    LocalDateTime Date = personList[0].dateOfBirth();
-    for (Person person: personList){
-      if (person.dateOfBirth().isBefore(Date)){
-        Date = person.dateOfBirth();
-      }
+  public static int getMaxGenerations(Person person) {
+    if (person.children() == null) {
+        return 1; // A pessoa é uma folha na árvore
     }
-    for (Person person: personList){
-      if (person.dateOfBirth() == Date){
-        System.out.println(person.name());
-        System.out.println(person.dateOfBirth());
-        System.out.println(Date);
+    int maxGenerations = 0;
+    for (Person child : person.children()) {
+        maxGenerations = Math.max(maxGenerations, getMaxGenerations(child));
+    }
+    return maxGenerations + 1;
+  }
+
+  private Person findOldestLastGenerationChild(Person person) {
+    if (person.children() == null) {
         return person;
-      }
     }
-
-    return null;
+    return Arrays.stream(person.children())
+                 .map(this::findOldestLastGenerationChild)
+                 .min(Comparator.comparing(Person::dateOfBirth))
+                 .orElse(person);
   }
 
+  private String generateTeknonymy(Person person, Person lastGenerationChild) {
+    String sex = person.sex() == 'M' ? "father" : "mother";
+    return sex + " of " + lastGenerationChild.name();
+  }
 }

@@ -63,27 +63,29 @@ public class TeknonymyServiceTest {
   }
 
   @Test
-  public void getOldestChildTest() {
+  public void ThreeGenerationsTest() {
     Person person = new Person(
         "John",
         'M',
-        new Person[]{ new Person("Holy",'F', null, LocalDateTime.of(1046, 1, 1, 0, 0)), new Person("Mary",'F', null, LocalDateTime.of(1046, 1, 1, 0, 0)) },
+        new Person[]{ new Person("Holy",'F', new Person[]{ new Person("Mary",'F', new Person[]{ new Person("Jane",'F', null, LocalDateTime.of(1046, 1, 1, 0, 0)) }, LocalDateTime.of(1046, 1, 1, 0, 0)) }, LocalDateTime.of(1046, 1, 1, 0, 0)) },
         LocalDateTime.of(1046, 1, 1, 0, 0));
-    Person[] personList = person.children();
-    Person result = new TeknonymyService().getOldestChild(personList);
-    Person expected = personList[0];
+    String result = new TeknonymyService().getTeknonymy(person);
+    String expected = "father of Jane";
     assertEquals(result, expected);
   }
 
   @Test
-  public void getLastGenerationChildTest() {
-    Person person = new Person(
-        "John",
-        'M',
-        new Person[]{ new Person("Holy",'F', null, LocalDateTime.of(1046, 1, 1, 0, 0)), new Person("Mary",'F', null, LocalDateTime.of(1044, 1, 1, 0, 0)) },
-        LocalDateTime.of(1020, 1, 1, 0, 0));
-        String result = new TeknonymyService().getTeknonymy(person);
-    String expected = "father of Mary";
+  public void TwoGenaritionsEach2ChildsTest(){
+    Person F = new Person("F", 'M', null, LocalDateTime.of(2024,1,1,0,0));
+    Person G = new Person("G", 'M', null, LocalDateTime.of(2021,1,1,0,0));
+    Person H = new Person("H", 'M', null, LocalDateTime.of(2022,1,1,0,0));
+
+    Person E = new Person("E",'M', new Person[]{F,G}, LocalDateTime.of(2019,1,1,0,0));
+    Person S = new Person("S",'M',new Person[]{H}, LocalDateTime.of(2019,1,1,0,0));
+    Person D = new Person("D",'F',new Person[]{S,E}, LocalDateTime.of(2003,1,1,0,0));
+
+    String result = new TeknonymyService().getTeknonymy(D);
+    String expected = "mother of G";
     assertEquals(result, expected);
   }
 
@@ -102,8 +104,7 @@ public class TeknonymyServiceTest {
     Person A = new Person("A",'M',new Person[]{B,C,D}, LocalDateTime.of(1990,1,1,0,0));
 
     String result = new TeknonymyService().getTeknonymy(A);
-    String expected = "father of F";
-
+    String expected = "father of H";
     assertEquals(result, expected);
   }
 }
