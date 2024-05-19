@@ -90,45 +90,39 @@ class TeknonymyService implements ITeknonymyService {
    * Method to generate the Teknonymy Name of a person
    * @param person
    * @param lastGenerationChild
-   * @return String which is the Teknonymy Name
+   * @return String which is the Teknonymy Nameif it's a role after great-great-grandfather or great-great-grandmother it will return ancestor
    */
   private String generateTeknonymy(Person person, Person lastGenerationChild) {
-      int generation = getMaxGenerations(person);
-      String role = "";
-      if (person.sex() == 'M'){
-          if (generation == 2){
+    int generation = getMaxGenerations(person);
+    String role = "";
+
+    if (person.sex() == 'M') {
+        if (generation == 2) {
             role = "father";
-          }
-          else if (generation == 3){
+        } else if (generation == 3) {
             role = "grandfather";
-          }
-          else if (generation == 4){
-            role = "great-grandfather";
-          }
-          else if (generation == 5){
-            role = "great-great-grandfather";
-          }
-          else if (generation > 5){
-            role = "ancestor";
-          }
-          return role + " of " + lastGenerationChild.name();
-      }
-      else {
-          if (generation == 2){
+        } else {
+            role = "great-";
+            for (int i = 5; i <= generation; i++) {
+                role += "great-";
+            }
+            role += "grandfather";
+        }
+    } else {
+        if (generation == 2) {
             role = "mother";
-          }
-          else if (generation == 3){
+        } else if (generation == 3) {
             role = "grandmother";
-          }
-          else if (generation == 4){
-            role = "great-grandmother";
-          }
-          else if (generation == 5){
-            role = "great-great-grandmother";
-          }else if (generation > 5){
-            role = "ancestor";
-          }
-          return role + " of " + lastGenerationChild.name();
-      }
+        } else {
+            role = "great-";
+            for (int i = 4; i <= generation; i++) {
+                role += "great-";
+            }
+            role += "grandmother";
+        }
     }
+
+    return role + " of " + lastGenerationChild.name();
+}
+
 }
