@@ -15,12 +15,13 @@ class TeknonymyService implements ITeknonymyService {
    * @return String which is the Teknonymy Name 
    */
   public String getTeknonymy(Person person) {
-    if (getMaxGenerations(person) == 1) { 
+    int generations= getMaxGenerations(person);
+    if (generations == 1) { 
         return ""; // Se a pessoa não tiver filhos, não há tecnônimo
     } else {
         List<Person> lastGenerationChildren = new ArrayList<>();
         //get all last generation children
-        getAllLastGeneration(person, lastGenerationChildren,getMaxGenerations(person),0);
+        getAllLastGeneration(person, lastGenerationChildren,generations,0);
         //find the oldest child
         Person oldestChild = findOldestChild(lastGenerationChildren);
         return generateTeknonymy(person, oldestChild);
